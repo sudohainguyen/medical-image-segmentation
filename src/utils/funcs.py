@@ -136,3 +136,7 @@ def print_info(info, _type=None):
                 cprint(i, _type[0], attrs=[_type[1]])
     else:
         print(info)
+
+
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)

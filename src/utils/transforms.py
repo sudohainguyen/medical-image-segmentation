@@ -3,15 +3,11 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
-import numpy as np
 import cv2
-from PIL import Image
+import numpy as np
 
 
 class CLAHE:
-    """
-    Contrast-limited adaptive histogram equalization
-    """
     def __init__(self, clipLimit=2.0, tileGridSize=(8, 8)):
         self.clipLimit = clipLimit
         self.tileGridSize = tileGridSize
@@ -27,30 +23,38 @@ class CLAHE:
 
 
 class Shift:
-    def __init__(self, limit=4, prob=.5):
+    """
+    Alternative implementation of shift using opencv
+    """    
+    def __init__(self, limit=0.2, prob=.5, img_channels=3):
         self.limit = limit
         self.prob = prob
+        self.img_channels = img_channels
 
     def __call__(self, img, mask=None):
         if np.random.random() < self.prob:
-            img = np.array(img, dtype=np.uint8)
-            limit = self.limit
-            dx = round(np.random.uniform(-limit, limit))
-            dy = round(np.random.uniform(-limit, limit))
-            height, width, _ = img.shape
-            y1 = limit + dy
+            if not isinstance(img, np.ndarray):
+                img = np.array(img, dtype=np.uint8)
+            height, width = img.shape[:2]
+            xlimit = int(self.limit * width)
+            ylimit = int(self.limit * height)
+            dx = round(np.random.uniform(-xlimit, xlimit))
+            dy = round(np.random.uniform(-ylimit, ylimit))
+            y1 = ylimit + dy
             y2 = y1 + height
-            x1 = limit + dx
+            x1 = xlimit + dx
             x2 = x1 + width
 
-            img1 = cv2.copyMakeBorder(img, limit, limit, limit, limit, 
+            img1 = cv2.copyMakeBorder(img, ylimit, ylimit, xlimit, xlimit, 
                                       borderType=cv2.BORDER_REFLECT_101)
-            img = img1[y1:y2, x1:x2, :]
-            img = Image.fromarray(img)
+            if self.img_channels == 1:
+                img = img1[y1:y2, x1:x2]
+            else:
+                img = img1[y1:y2, x1:x2, :]
             if mask is not None:
-                mask = np.array(mask, dtype=np.uint8)
-                msk1 = cv2.copyMakeBorder(mask, limit, limit, limit, limit,
+                if not isinstance(mask, np.ndarray):
+                    mask = np.array(mask, dtype=np.uint8)
+                msk1 = cv2.copyMakeBorder(mask, ylimit, ylimit, xlimit, xlimit,
                                           borderType=cv2.BORDER_REFLECT_101)
                 mask = msk1[y1:y2, x1:x2]
-                mask = Image.fromarray(mask)
         return img, mask
