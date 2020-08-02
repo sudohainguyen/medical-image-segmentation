@@ -19,7 +19,7 @@ class Conv2D(nn.Module):
         groups=1,
         activation='relu',
         use_pad=False,
-        use_bn=False,
+        use_bn=True,
         bn_eps=1e-5
     ):
         super(Conv2D, self).__init__()
@@ -53,28 +53,28 @@ class Conv2D(nn.Module):
         return x
 
 
-def conv2d_1x1_relu(in_channels, out_channels):
-    return Conv2D(in_channels, out_channels, kernel_size=1, 
-                  use_pad=False, stride=1, activation='relu')
+def conv2d_1x1_relu(in_channels, out_channels, use_bn=True):
+    return Conv2D(in_channels, out_channels, kernel_size=1, use_bn=use_bn, 
+                  stride=1, activation='relu')
 
 
-def conv2d_3x3_relu(in_channels, out_channels):
-    return Conv2D(in_channels, out_channels, kernel_size=3,
+def conv2d_3x3_relu(in_channels, out_channels, use_bn=True):
+    return Conv2D(in_channels, out_channels, kernel_size=3, use_bn=use_bn,
                   padding=1, stride=1, activation='relu')
 
 
 def conv2d_5x5_relu(in_channels, out_channels):
     return Conv2D(in_channels, out_channels, kernel_size=5,
                   padding=2, stride=1, activation='relu')
+    
 
+def conv2d_1x1(in_channels, out_channels, stride=1, use_bn=True):
+    return Conv2D(in_channels, out_channels, kernel_size=1, use_bn=use_bn,
+                  stride=stride, activation=None)
 
-def conv2d_1x1(in_channels, out_channels):
-    return Conv2D(in_channels, out_channels, kernel_size=1,
-                  use_pad=False, stride=1, activation=None)
-
-
-def conv2d_3x3(in_channels, out_channels, stride=1):
-    return Conv2D(in_channels, out_channels, kernel_size=3,
+    
+def conv2d_3x3(in_channels, out_channels, stride=1, use_bn=True):
+    return Conv2D(in_channels, out_channels, kernel_size=3, use_bn=use_bn,
                   padding=1, stride=stride, activation=None)
 
 
