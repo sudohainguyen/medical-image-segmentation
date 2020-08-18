@@ -36,3 +36,17 @@ class UpConv(nn.Module):
     def forward(self, x):
         x = self.up(x)
         return x  
+
+
+class UpTranspose(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(UpTranspose, self).__init__()
+        self.up = nn.Sequential(
+            nn.ConvTranspose2d(in_channels, out_channels, 
+                               kernel_size=3, padding=1, stride=2),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True)
+        )
+    
+    def forward(self, x):
+        return self.up(x)
